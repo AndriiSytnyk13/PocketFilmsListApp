@@ -1,4 +1,4 @@
-package com.sytyy.example.ui.notifications
+package com.sytyy.example.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

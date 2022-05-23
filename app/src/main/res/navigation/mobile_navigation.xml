@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.sytyy.example.ui.home.AllFilmsFragment"
+        android:name="com.sytyy.example.view.fragments.AllFilmsFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_all_films" />
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.sytyy.example.ui.dashboard.DashboardFragment"
+        android:name="com.sytyy.example.view.fragments.DashboardFragment"
         android:label="@string/title_dashboard"
         tools:layout="@layout/fragment_dashboard" />
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.sytyy.example.ui.notifications.NotificationsFragment"
+        android:name="com.sytyy.example.view.fragments.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
 </navigation>

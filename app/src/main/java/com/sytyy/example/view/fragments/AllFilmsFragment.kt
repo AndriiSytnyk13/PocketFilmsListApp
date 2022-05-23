@@ -1,4 +1,4 @@
-package com.sytyy.example.ui.home
+package com.sytyy.example.view.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,6 +9,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import com.sytyy.example.R
 import com.sytyy.example.databinding.FragmentAllFilmsBinding
+import com.sytyy.example.view.activities.AddUpdateFilmActivity
 
 class AllFilmsFragment : Fragment(R.layout.fragment_all_films) {
 

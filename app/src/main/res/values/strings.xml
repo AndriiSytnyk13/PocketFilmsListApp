@@ -4,4 +4,10 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="add_film">Add Film</string>
+    <string name="film_name">Film Name</string>
+    <string name="film_genre">Genre</string>
+    <string name="film_description">Description</string>
+    <string name="select_image_text">Select Image Action</string>
+    <string name="camera_text">Camera</string>
+    <string name="galery_text">Galery</string>
 </resources>
