@@ -1,10 +1,29 @@
 package com.sytyy.example.view.activities
 
+import android.Manifest
+import android.app.Activity
+import android.app.AlertDialog
 import android.app.Dialog
-import androidx.appcompat.app.AppCompatActivity
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.graphics.Bitmap
+import android.media.audiofx.Equalizer
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
+import android.provider.Settings
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionDeniedResponse
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import com.karumi.dexter.listener.single.PermissionListener
 import com.sytyy.example.R
 import com.sytyy.example.databinding.ActivityAddUpdateFilmBinding
 import com.sytyy.example.databinding.DialogFilmImgSelectionBinding
@@ -49,7 +68,100 @@ class AddUpdateFilmActivity : AppCompatActivity(), View.OnClickListener {
         val binding = DialogFilmImgSelectionBinding.inflate(layoutInflater)
         dialog.setContentView(binding.root)
 
+        //request permissions
+        binding.addPictureFromCamera.setOnClickListener {
+            Dexter.withContext(this).withPermissions(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA
+            ).withListener(object : MultiplePermissionsListener {
+                override fun onPermissionsChecked(p0: MultiplePermissionsReport?) {
+                    p0?.let {
+                        if (p0.areAllPermissionsGranted()) {
+                           val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                            startActivityForResult(intent, CAMERA)
+                        }
+                    }
+                }
+
+                override fun onPermissionRationaleShouldBeShown(
+                    permision: MutableList<PermissionRequest>?,
+                    token: PermissionToken?
+                ) {
+                    showRationalDialogForPermission()
+                }
+
+            }).onSameThread().check()
+            dialog.dismiss()
+        }
+        binding.addPictureFromGalery.setOnClickListener {
+            Dexter.withContext(this).withPermission(
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ).withListener(object : PermissionListener {
+                override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
+                       val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                    startActivityForResult(intent, GALARRY)
+                }
+
+                override fun onPermissionDenied(p0: PermissionDeniedResponse?) {
+                    Toast.makeText(this@AddUpdateFilmActivity, "You denyied permissions permission", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onPermissionRationaleShouldBeShown(
+                    p0: PermissionRequest?,
+                    p1: PermissionToken?
+                ) {
+                    showRationalDialogForPermission()
+                }
+
+            }).onSameThread().check()
+            dialog.dismiss()
+        }
+
         dialog.show()
 
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(resultCode == Activity.RESULT_OK) {
+            if(requestCode == CAMERA) {
+                data?.extras?.let {
+                val thumbnail: Bitmap = data.extras!!.get("data") as Bitmap
+                    mBinding.filmImage.setImageBitmap(thumbnail)
+                    mBinding.addFilmImgButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.edit_))
+                }
+            }
+            if(requestCode == GALARRY) {
+                data?.let {
+                    val selectedImgUri = data.data
+                    mBinding.filmImage.setImageURI(selectedImgUri)
+                    mBinding.addFilmImgButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.edit_))
+                }
+            }
+        }
+    }
+
+    private fun showRationalDialogForPermission() {
+        AlertDialog.Builder(this)
+            .setMessage("Please enable permissions in Application Settings")
+            .setPositiveButton("GO TO SETTINGS") { _,_ ->
+                try {
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    val uri = Uri.fromParts("package", packageName, null)
+                    intent.data = uri
+                    startActivity(intent)
+                } catch (e: ActivityNotFoundException) {
+                    e.printStackTrace()
+                }
+            }
+            .setNegativeButton("Cancel") {
+                dialog,_ ->
+                dialog.dismiss()
+            }.show()
+    }
+
+    companion object {
+        private const val CAMERA = 1
+        private const val GALARRY = 2
     }
 }
